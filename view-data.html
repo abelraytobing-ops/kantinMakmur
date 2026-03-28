@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Lihat Data Pesanan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1f1f1f;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            border: 1px solid #444;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #007BFF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .external-links a:hover {
+            background: currentColor;
+            color: #1f1f1f !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+        }
+        
+        .data-section {
+            margin-bottom: 30px;
+        }
+        
+        .data-title {
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007BFF;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #eee;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        
+        th {
+            background: #333;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: #3a3a3a;
+        }
+        
+        .summary-card {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007BFF;
+        }
+        
+        .summary-title {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        
+        .summary-total {
+            font-weight: bold;
+            color: #fff;
+            font-size: 18px;
+            border-top: 1px solid #444;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .json-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .json-title {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #0f0;
+            font-size: 12px;
+            border: 1px solid #444;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        .export-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .export-title {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Aplikasi Lihat Data Pesanan</h1>
+        <p class="subtitle">Kelola dan lihat data pesanan makanan & minuman</p>
+        
+        <div class="nav">
+            <button class="btn-primary" onclick="loadData()">🔄 Muat Data</button>
+            <button class="btn-secondary" onclick="exportToJSON()">📄 Export JSON</button>
+            <button class="btn-secondary" onclick="exportToCSV()">📊 Export CSV</button>
+            <button class="btn-danger" onclick="clearAllData()">🗑️ Hapus Semua Data</button>
+        </div>
+        
+        <div id="summarySection" class="data-section" style="display: none;">
+            <div class="data-title">💰 Ringkasan Pembayaran</div>
+            <div class="summary-card">
+                <div class="summary-title">Total Pesanan</div>
+                <div class="summary-item">
+                    <span>Total Belanja:</span>
+                    <span id="totalBelanja">Rp0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Diskon (10%):</span>
+                    <span id="diskon">Rp0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Pajak (5%):</span>
+                    <span id="pajak">Rp0</span>
+                </div>
+                <div class="summary-item summary-total">
+                    <span>Total Bayar:</span>
+                    <span id="totalAkhir">Rp0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tableSection" class="data-section" style="display: none;">
+            <div class="data-title">📋 Detail Pesanan</div>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Item</th>
+                            <th>Jumlah</th>
+                            <th>Harga Satuan</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="5" class="no-data">Belum ada data pesanan</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="jsonSection" class="data-section" style="display: none;">
+            <div class="data-title">🔧 Data JSON</div>
+            <div class="json-section">
+                <div class="json-title">Data Pesanan (Format JSON)</div>
+                <pre id="jsonData">[]</pre>
+            </div>
+        </div>
+        
+        <div class="export-section">
+            <div class="export-title">📤 Export Data</div>
+            <div class="export-buttons">
+                <button class="btn-secondary" onclick="exportToJSON()">📄 Download JSON</button>
+                <button class="btn-secondary" onclick="exportToCSV()">📊 Download CSV</button>
+                <button class="btn-secondary" onclick="copyToClipboard()">📋 Copy JSON</button>
+            </div>
+        </div>
+        
+        <div class="external-links" style="margin-top: 30px; text-align: center; padding: 20px; background: #2a2a2a; border-radius: 8px; border: 1px solid #444;">
+            <h3 style="color: #fff; margin-bottom: 15px;">🔗 Link External</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://github.com" target="_blank" style="color: #007BFF; text-decoration: none; padding: 8px 12px; border: 1px solid #007BFF; border-radius: 5px; transition: all 0.3s;">🐙 GitHub</a>
+                <a href="https://www.w3schools.com" target="_blank" style="color: #28a745; text-decoration: none; padding: 8px 12px; border: 1px solid #28a745; border-radius: 5px; transition: all 0.3s;">📚 W3Schools</a>
+                <a href="https://developer.mozilla.org" target="_blank" style="color: #dc3545; text-decoration: none; padding: 8px 12px; border: 1px solid #dc3545; border-radius: 5px; transition: all 0.3s;">📖 MDN Web Docs</a>
+                <a href="https://stackoverflow.com" target="_blank" style="color: #f39c12; text-decoration: none; padding: 8px 12px; border: 1px solid #f39c12; border-radius: 5px; transition: all 0.3s;">❓ Stack Overflow</a>
+                <a href="test.html" target="_blank" style="color: #17a2b8; text-decoration: none; padding: 8px 12px; border: 1px solid #17a2b8; border-radius: 5px; transition: all 0.3s;">🍽️ Kembali ke Pesanan</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Proteksi akses - hanya bisa diakses dari aplikasi utama
+        const allowedReferrers = ['test.html', 'kantin.html', 'index.html', 'localhost', '127.0.0.1'];
+        const currentReferrer = document.referrer;
+        const isFromAllowedSource = allowedReferrers.some(ref => 
+            currentReferrer.includes(ref) || currentReferrer === ''
+        );
+
+        // Cek password dari URL parameter atau session
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasValidAccess = sessionStorage.getItem('adminAccess') === 'true' || 
+                              urlParams.get('key') === 'admin123' ||
+                              isFromAllowedSource;
+
+        if (!hasValidAccess) {
+            // Tampilkan halaman login
+            showLoginPage();
+        } else {
+            // Set session untuk akses selanjutnya
+            sessionStorage.setItem('adminAccess', 'true');
+            initializeApp();
+        }
+
+        function showLoginPage() {
+            document.body.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: #eee; font-family: 'Segoe UI', sans-serif;">
+                    <div style="background: #1f1f1f; padding: 40px; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; max-width: 400px; width: 90%;">
+                        <h1 style="color: #fff; margin-bottom: 10px;">🔒 Akses Terbatas</h1>
+                        <p style="color: #aaa; margin-bottom: 30px;">Halaman ini hanya untuk administrator</p>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <input type="password" id="passwordInput" placeholder="Masukkan password" 
+                                   style="width: 100%; padding: 12px; border: 1px solid #444; border-radius: 5px; background: #2a2a2a; color: #eee; font-size: 16px;">
+                        </div>
+                        
+                        <button onclick="checkPassword()" 
+                                style="width: 100%; padding: 12px; background: #007BFF; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-bottom: 15px;">
+                            Masuk
+                        </button>
+                        
+                        <button onclick="goBack()" 
+                                style="width: 100%; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                            Kembali ke Aplikasi Utama
+                        </button>
+                        
+                        <p style="color: #666; font-size: 12px; margin-top: 20px;">💡 Password default: admin123</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === 'admin123') {
+                sessionStorage.setItem('adminAccess', 'true');
+                location.reload();
+            } else {
+                alert('Password salah!');
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'test.html';
+        }
+
+        function initializeApp() {
+            let currentData = [];
+
+            function loadData() {
+                const savedData = localStorage.getItem('pesananData');
+                if (!savedData) {
+                    alert('Tidak ada data pesanan tersimpan.');
+                    hideAllSections();
+                    return;
+                }
+                
+                try {
+                    currentData = JSON.parse(savedData);
+                    displayData();
+                } catch (e) {
+                    alert('Error memuat data: ' + e.message);
+                    console.error('Error loading data:', e);
+                }
+            }
+
+            function displayData() {
+                if (currentData.length === 0) {
+                    hideAllSections();
+                    return;
+                }
+
+                // Hitung summary
+                const totalBelanja = currentData.reduce((sum, item) => sum + item.subtotal, 0);
+                const diskon = totalBelanja >= 50000 ? totalBelanja * 0.1 : 0;
+                const pajak = (totalBelanja - diskon) * 0.05;
+                const totalAkhir = totalBelanja - diskon + pajak;
+
+                // Update summary
+                document.getElementById('totalBelanja').textContent = 'Rp' + totalBelanja.toLocaleString('id-ID');
+                document.getElementById('diskon').textContent = 'Rp' + diskon.toLocaleString('id-ID');
+                document.getElementById('pajak').textContent = 'Rp' + pajak.toLocaleString('id-ID');
+                document.getElementById('totalAkhir').textContent = 'Rp' + totalAkhir.toLocaleString('id-ID');
+                document.getElementById('summarySection').style.display = 'block';
+
+                // Update table
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = '';
+                
+                currentData.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item.item}</td>
+                        <td>${item.qty}</td>
+                        <td>Rp${item.unit.toLocaleString('id-ID')}</td>
+                        <td>Rp${item.subtotal.toLocaleString('id-ID')}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                document.getElementById('tableSection').style.display = 'block';
+
+                // Update JSON
+                const dataWithSummary = {
+                    pesanan: currentData,
+                    ringkasan: {
+                        totalBelanja: totalBelanja,
+                        diskon: diskon,
+                        pajak: pajak,
+                        totalAkhir: totalAkhir
+                    },
+                    timestamp: new Date().toISOString()
+                };
+                
+                document.getElementById('jsonData').textContent = JSON.stringify(dataWithSummary, null, 2);
+                document.getElementById('jsonSection').style.display = 'block';
+            }
+
+            function hideAllSections() {
+                document.getElementById('summarySection').style.display = 'none';
+                document.getElementById('tableSection').style.display = 'none';
+                document.getElementById('jsonSection').style.display = 'none';
+            }
+
+            function exportToJSON() {
+                if (currentData.length === 0) {
+                    alert('Tidak ada data untuk diexport.');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(currentData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'data-pesanan-' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            function exportToCSV() {
+                if (currentData.length === 0) {
+                    alert('Tidak ada data untuk diexport.');
+                    return;
+                }
+                
+                let csv = 'No,Item,Jumlah,Harga Satuan,Subtotal\n';
+                currentData.forEach((item, index) => {
+                    csv += `${index + 1},"${item.item}",${item.qty},${item.unit},${item.subtotal}\n`;
+                });
+                
+                const csvBlob = new Blob([csv], {type: 'text/csv'});
+                const url = URL.createObjectURL(csvBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'data-pesanan-' + new Date().toISOString().split('T')[0] + '.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            function copyToClipboard() {
+                if (currentData.length === 0) {
+                    alert('Tidak ada data untuk dicopy.');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(currentData, null, 2);
+                navigator.clipboard.writeText(dataStr).then(() => {
+                    alert('Data JSON berhasil dicopy ke clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Gagal copy ke clipboard. Silakan copy manual dari bagian JSON.');
+                });
+            }
+
+            function clearAllData() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data pesanan?')) {
+                    localStorage.removeItem('pesananData');
+                    currentData = [];
+                    hideAllSections();
+                    alert('Semua data pesanan telah dihapus.');
+                }
+            }
+
+            // Load data saat halaman dimuat
+            window.onload = function() {
+                loadData();
+            };
+
+            // Expose functions to global scope
+            window.exportToJSON = exportToJSON;
+            window.exportToCSV = exportToCSV;
+            window.copyToClipboard = copyToClipboard;
+            window.clearAllData = clearAllData;
+        }
+    </script>
+</body>
+</html>

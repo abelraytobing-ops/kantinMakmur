@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Makanan dan Minuman</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000000;
+        }
+        
+        .menu-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .menu-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #000000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            background: #e8e8e8;
+            transform: translateX(5px);
+        }
+        
+        .menu-item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .menu-item-price {
+            color: #000000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
+            color: white;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+        
+        .btn-reset {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-data {
+            background: #007BFF;
+            color: white;
+        }
+        
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-invoice {
+            background: #28a745;
+            color: white;
+        }
+        
+        .external-links a:hover {
+            background: #007BFF;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            border-left: 4px solid #000000;
+            display: none;
+        }
+        
+        .output.show {
+            display: block;
+        }
+        
+        .output-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .modal-content button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-confirm {
+            background: #000;
+            color: white;
+        }
+        .btn-cancel {
+            background: #ccc;
+        }
+        
+        .invoice-modal .modal-content {
+            max-width: 500px;
+            width: 90%;
+            text-align: left;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .invoice-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .invoice-summary {
+            text-align: right;
+        }
+        
+        .invoice-summary div {
+            margin-bottom: 5px;
+        }
+        
+        .btn-print {
+            background: #007BFF;
+            color: white;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Pesanan Makanan & Minuman</h1>
+        <p class="subtitle">Kantin Makmur</p>
+        
+        <div class="menu-section">
+            <div class="menu-title">🍚 Menu Makanan</div>
+            <div class="menu-items">
+                <div class="menu-item" onclick="addItem('Nasi Goreng', 15000)">
+                    <div class="menu-item-name">1. Nasi Goreng</div>
+                    <div class="menu-item-price">Rp15.000</div>
+                </div>
+                <div class="menu-item" onclick="addItem('Mie Goreng', 12000)">
+                    <div class="menu-item-name">2. Mie Goreng</div>
+                    <div class="menu-item-price">Rp12.000</div>
+                </div>
+                <div class="menu-item" onclick="addItem('Nasi Rames', 10000)">
+                    <div class="menu-item-name">3. Nasi Rames</div>
+                    <div class="menu-item-price">Rp10.000</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="menu-section">
+            <div class="menu-title">🥤 Menu Minuman</div>
+            <div class="menu-items">
+                <div class="menu-item" onclick="addItem('Es Teh', 3000)">
+                    <div class="menu-item-name">1. Es Teh</div>
+                    <div class="menu-item-price">Rp3.000</div>
+                </div>
+                <div class="menu-item" onclick="addItem('Es Jeruk', 4000)">
+                    <div class="menu-item-name">2. Es Jeruk</div>
+                    <div class="menu-item-price">Rp4.000</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-reset" onclick="resetOutput()">🔄 Reset</button>
+            <button class="btn-invoice" onclick="generateInvoice()">📄 Invoice</button>
+            <button class="btn-view" onclick="window.open('view-data.html', '_blank')">📱 Aplikasi Data</button>
+        </div>
+        
+        <div id="output" class="output">
+            <div class="output-title">📋 Rincian Pesanan:</div>
+            <div id="outputContent" class="output-content"></div>
+        </div>
+
+        <div id="slider" class="output" style="display: none;">
+            <div class="output-title">🛒 Slide Pesanan</div>
+            <div id="sliderContent" class="output-content"></div>
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; gap: 10px;">
+                <button onclick="prevSlide()" style="width: 48%; padding: 10px; border-radius: 8px; border: 1px solid #000; background: #fff;">◀ Prev</button>
+                <button onclick="nextSlide()" style="width: 48%; padding: 10px; border-radius: 8px; border: 1px solid #000; background: #fff;">Next ▶</button>
+            </div>
+            <div id="slideIndex" style="margin-top: 10px; color: #333; font-size: 13px; text-align: center;"></div>
+        </div>
+        
+        <div class="external-links" style="margin-top: 30px; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="color: #333; margin-bottom: 15px;">🔗 Link External</h3>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://maps.app.goo.gl/g7e5avWE7zty1Knu8" target="_blank" style="color: #007BFF; text-decoration: none; padding: 8px 12px; border: 1px solid #007BFF; border-radius: 5px; transition: all 0.3s;">🐙 Location</a>
+                <a href="https://www.instagram.com/abelrtobing/" target="_blank" style="color: #28a745; text-decoration: none; padding: 8px 12px; border: 1px solid #28a745; border-radius: 5px; transition: all 0.3s;">📷 Instagram</a>
+                <a href="https://youtube.com/@abelray2850?si=czgX23g9Eq2_XseS" target="_blank" style="color: #dc3545; text-decoration: none; padding: 8px 12px; border: 1px solid #dc3545; border-radius: 5px; transition: all 0.3s;">▶ YouTube</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Masukkan Jumlah</h3>
+            <input type="number" id="qtyInput" min="1" value="1" placeholder="Jumlah">
+            <div>
+                <button class="btn-confirm" onclick="confirmAdd()">Tambah</button>
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="invoiceModal" class="modal invoice-modal">
+        <div class="modal-content">
+            <div id="invoiceContent"></div>
+            <button class="btn-print" onclick="printInvoice()">🖨️ Cetak Invoice</button>
+            <button class="btn-cancel" onclick="closeInvoiceModal()">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        var cartSlides = [];
+        var currentSlide = 0;
+        var selectedItem = null;
+        var selectedPrice = 0;
+
+        function addItem(item, harga) {
+            selectedItem = item;
+            selectedPrice = harga;
+            document.getElementById('modalTitle').innerText = 'Masukkan jumlah ' + item;
+            document.getElementById('qtyInput').value = 1;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function confirmAdd() {
+            var qty = Number(document.getElementById('qtyInput').value);
+            if (!qty || qty <= 0) {
+                alert('Jumlah harus angka positif.');
+                return;
+            }
+            var subtotal = qty * selectedPrice;
+            cartSlides.push({ item: selectedItem, qty: qty, unit: selectedPrice, subtotal: subtotal });
+            localStorage.setItem('pesananData', JSON.stringify(cartSlides)); // Simpan otomatis
+            currentSlide = cartSlides.length - 1;
+            updateSlider();
+            updateSummary();
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            selectedItem = null;
+            selectedPrice = 0;
+        }
+
+        function updateSlider() {
+            var slider = document.getElementById('slider');
+            var sliderContent = document.getElementById('sliderContent');
+            var slideIndex = document.getElementById('slideIndex');
+
+            if (cartSlides.length === 0) {
+                sliderContent.innerHTML = 'Belum ada pesanan.';
+                slideIndex.innerHTML = '';
+                slider.style.display = 'none';
+                return;
+            }
+
+            var s = cartSlides[currentSlide];
+            sliderContent.innerHTML = '<strong>Item:</strong> ' + s.item + '<br>' +
+                                      '<strong>Jumlah:</strong> ' + s.qty + '<br>' +
+                                      '<strong>Harga Satuan:</strong> Rp' + s.unit.toLocaleString('id-ID') + '<br>' +
+                                      '<strong>Subtotal:</strong> Rp' + s.subtotal.toLocaleString('id-ID');
+            slideIndex.innerHTML = 'Slide ' + (currentSlide + 1) + ' / ' + cartSlides.length;
+            slider.style.display = 'block';
+        }
+
+        function nextSlide() {
+            if (cartSlides.length === 0) return;
+            currentSlide = (currentSlide + 1) % cartSlides.length;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            if (cartSlides.length === 0) return;
+            currentSlide = (currentSlide - 1 + cartSlides.length) % cartSlides.length;
+            updateSlider();
+        }
+
+        function updateSummary() {
+            var totalBelanja = cartSlides.reduce(function(sum, i) { return sum + i.subtotal; }, 0);
+            var diskon = totalBelanja >= 50000 ? totalBelanja * 0.1 : 0;
+            var pajak = (totalBelanja - diskon) * 0.05;
+            var totalAkhir = totalBelanja - diskon + pajak;
+
+            var rincian = '<strong>Ringkasan:</strong><br>' +
+                'Total Belanja: Rp' + totalBelanja.toLocaleString('id-ID') + '<br>' +
+                'Diskon: Rp' + diskon.toLocaleString('id-ID') + '<br>' +
+                'Pajak 5%: Rp' + pajak.toLocaleString('id-ID') + '<br>' +
+                '<strong>Total Bayar: Rp' + totalAkhir.toLocaleString('id-ID') + '</strong>';
+
+            var outputDiv = document.getElementById('output');
+            var outputContent = document.getElementById('outputContent');
+            outputContent.innerHTML = rincian;
+            outputDiv.classList.add('show');
+        }
+
+        function showData() {
+            if (cartSlides.length === 0) {
+                alert('Belum ada pesanan untuk ditampilkan.');
+                return;
+            }
+            
+            // Simpan ke localStorage
+            localStorage.setItem('pesananData', JSON.stringify(cartSlides));
+            
+            // Hitung total
+            var totalBelanja = cartSlides.reduce(function(sum, i) { return sum + i.subtotal; }, 0);
+            var diskon = totalBelanja >= 50000 ? totalBelanja * 0.1 : 0;
+            var pajak = (totalBelanja - diskon) * 0.05;
+            var totalAkhir = totalBelanja - diskon + pajak;
+            
+            // Buat data lengkap
+            var dataPesanan = {
+                pesanan: cartSlides,
+                ringkasan: {
+                    totalBelanja: totalBelanja,
+                    diskon: diskon,
+                    pajak: pajak,
+                    totalAkhir: totalAkhir
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            // Tampilkan dalam alert atau console
+            var dataString = JSON.stringify(dataPesanan, null, 2);
+            console.log('Data Pesanan:', dataString);
+            
+            // Tampilkan di halaman
+            var outputDiv = document.getElementById('output');
+            var outputContent = document.getElementById('outputContent');
+            outputContent.innerHTML = '<strong>Data Pesanan (JSON):</strong><br><pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; font-size: 12px;">' + dataString + '</pre>';
+            outputDiv.classList.add('show');
+            
+            alert('Data pesanan sudah disimpan ke penyimpanan browser dan ditampilkan di konsol (F12) serta di halaman.');
+        }
+
+        function resetOutput() {
+            var outputDiv = document.getElementById('output');
+            var outputContent = document.getElementById('outputContent');
+            var slider = document.getElementById('slider');
+            var sliderContent = document.getElementById('sliderContent');
+            var slideIndex = document.getElementById('slideIndex');
+
+            cartSlides = [];
+            currentSlide = 0;
+            outputContent.innerHTML = '';
+            outputDiv.classList.remove('show');
+            sliderContent.innerHTML = '';
+            slideIndex.innerHTML = '';
+            slider.style.display = 'none';
+            localStorage.removeItem('pesananData'); // Hapus data tersimpan
+        }
+
+        function generateInvoice() {
+            if (cartSlides.length === 0) {
+                alert('Belum ada pesanan untuk membuat invoice.');
+                return;
+            }
+            
+            var totalBelanja = cartSlides.reduce(function(sum, i) { return sum + i.subtotal; }, 0);
+            var diskon = totalBelanja >= 50000 ? totalBelanja * 0.1 : 0;
+            var pajak = (totalBelanja - diskon) * 0.05;
+            var totalAkhir = totalBelanja - diskon + pajak;
+            
+            var invoiceHTML = `
+                <div class="invoice-header">
+                    <h2>🍽️ Kantin Makmur</h2>
+                    <p>Invoice Pesanan</p>
+                    <p>Tanggal: ${new Date().toLocaleDateString('id-ID')}</p>
+                </div>
+                <div class="invoice-details">
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Jumlah</th>
+                                <th>Harga Satuan</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            cartSlides.forEach(function(item) {
+                invoiceHTML += `
+                            <tr>
+                                <td>${item.item}</td>
+                                <td>${item.qty}</td>
+                                <td>Rp${item.unit.toLocaleString('id-ID')}</td>
+                                <td>Rp${item.subtotal.toLocaleString('id-ID')}</td>
+                            </tr>`;
+            });
+            
+            invoiceHTML += `
+                        </tbody>
+                    </table>
+                    <div class="invoice-summary">
+                        <div>Total Belanja: Rp${totalBelanja.toLocaleString('id-ID')}</div>
+                        <div>Diskon: Rp${diskon.toLocaleString('id-ID')}</div>
+                        <div>Pajak 5%: Rp${pajak.toLocaleString('id-ID')}</div>
+                        <div><strong>Total Bayar: Rp${totalAkhir.toLocaleString('id-ID')}</strong></div>
+                    </div>
+                </div>`;
+            
+            document.getElementById('invoiceContent').innerHTML = invoiceHTML;
+            document.getElementById('invoiceModal').style.display = 'flex';
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+
+        function printInvoice() {
+            var printContent = document.getElementById('invoiceContent').innerHTML;
+            var originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            location.reload(); // Reload to restore original page
+        }
+
+        // Load data dari localStorage saat halaman dimuat
+        window.onload = function() {
+            var savedData = localStorage.getItem('pesananData');
+            if (savedData) {
+                try {
+                    cartSlides = JSON.parse(savedData);
+                    if (cartSlides.length > 0) {
+                        currentSlide = 0;
+                        updateSlider();
+                        updateSummary();
+                        showSlider(true);
+                    }
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
